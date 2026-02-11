@@ -3,6 +3,13 @@ import { AppLayout } from "../providers/AppLayout";
 import { TicketsPage } from "../../pages/TicketsPage";
 import { TicketDetailsPage } from "../../pages/TicketDetailsPage";
 import { NotFoundPage } from "../../pages/NotFoundPage";
+import React, { Suspense, lazy } from 'react';
+
+const DashboardPage = lazy(()=>import('../../pages/DashboardPage').then(m=>({default:m.DashboardPage}))); 
+import { SettingsPage } from "../../pages/SettingsPage";
+import { UsersPage } from "../../pages/UsersPage";
+import { LogsPage } from "../../pages/LogsPage";
+import { RequireAdmin } from "../../features/auth/ui/RequireAdmin";
 import { LoginPage } from "../../pages/LoginPage";
 import { RequireAuth } from "../../features/auth/ui/RequireAuth";
 
@@ -17,6 +24,15 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <TicketsPage /> },
           { path: "tickets/:id", element: <TicketDetailsPage /> },
+          {
+            element: <RequireAdmin />,
+            children: [
+              { path: "dashboard", element: <Suspense fallback={<div style={{padding:20}}>Loading...</div>}><DashboardPage /></Suspense> },
+              { path: "settings", element: <SettingsPage /> },
+              { path: "users", element: <UsersPage /> },
+              { path: "logs", element: <LogsPage /> },
+            ],
+          },
         ],
       },
       { path: "*", element: <NotFoundPage /> },

@@ -4,6 +4,9 @@ import { Input } from "../../../shared/ui/Input/Input";
 import { Button } from "../../../shared/ui/Button/Button";
 import { Textarea } from "../../../shared/ui/Textarea/Textarea";
 import { Ticket, TicketPriority, TicketStatus } from "../../../shared/types/ticket";
+import { getUser } from "../../../features/auth/model/auth";
+import { useToast } from "../../../app/providers/ToastProvider";
+import { useLogs } from "../../../app/providers/LogsProvider";
 
 type Props = {
   isOpen: boolean;
@@ -32,6 +35,9 @@ function validate(f: Form): Errors {
 }
 
 export function CreateTicketModal({ isOpen, onClose, onCreate }: Props) {
+  const user = getUser();
+  const { toast } = useToast();
+  const { addLog } = useLogs();
   const [form, setForm] = useState<Form>({
     title: "",
     department: "فنی",
@@ -56,6 +62,7 @@ export function CreateTicketModal({ isOpen, onClose, onCreate }: Props) {
       priority: form.priority,
       createdAt: now,
       updatedAt: now,
+      requesterEmail: user?.email ?? "unknown@example.com",
       messages: [
         {
           id: `m-${Date.now()}`,
@@ -67,6 +74,8 @@ export function CreateTicketModal({ isOpen, onClose, onCreate }: Props) {
     };
 
     onCreate(ticket);
+    toast({ type: "success", title: "تیکت ثبت شد", message: "تیکت جدید با موفقیت اضافه شد." });
+    addLog({ action: "CREATE_TICKET", message: `Ticket ${ticket.id} created`, actorEmail: user?.email });
     onClose();
     setForm({ title: "", department: "فنی", priority: "normal", description: "" });
     setErrors({});

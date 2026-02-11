@@ -4,8 +4,12 @@ import { Card } from "../shared/ui/Card/Card";
 import { Input } from "../shared/ui/Input/Input";
 import { Button } from "../shared/ui/Button/Button";
 import { login } from "../features/auth/model/auth";
+import { useLogs } from "../app/providers/LogsProvider";
+import { useToast } from "../app/providers/ToastProvider";
 
 export function LoginPage() {
+  const { addLog } = useLogs();
+  const { toast } = useToast();
   const nav = useNavigate();
   const [email, setEmail] = useState("admin@example.com");
   const [password, setPassword] = useState("1234");
@@ -15,9 +19,13 @@ export function LoginPage() {
     try {
       setError("");
       await login(email, password);
+      addLog({ action: "LOGIN", message: `Login success for ${email}`, actorEmail: email });
+      toast({ type: "success", title: "ورود موفق", message: "خوش آمدید" });
       nav("/", { replace: true });
     } catch (e: any) {
       setError(e.message);
+      addLog({ level: "error", action: "LOGIN_FAILED", message: `Login failed for ${email}: ${e.message}`, actorEmail: email });
+      toast({ type: "error", title: "خطا در ورود", message: e.message });
     }
   };
 
