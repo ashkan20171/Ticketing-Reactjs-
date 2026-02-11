@@ -4,11 +4,13 @@ import { Input } from "../shared/ui/Input/Input";
 import { Button } from "../shared/ui/Button/Button";
 import { useUsers } from "../app/providers/UsersProvider";
 import { useToast } from "../app/providers/ToastProvider";
+import { useConfirm } from "../app/providers/ConfirmProvider";
 import { useLogs } from "../app/providers/LogsProvider";
 import { getUser } from "../features/auth/model/auth";
 import { Role } from "../features/auth/model/auth";
 
 export function UsersPage() {
+  const { confirm } = useConfirm();
   const { users, setRole, toggleActive } = useUsers();
   const { toast } = useToast();
   const { addLog } = useLogs();
@@ -28,7 +30,9 @@ export function UsersPage() {
     addLog({ action: "CHANGE_ROLE", message: `Role of ${email} changed to ${role}`, actorEmail: actor?.email });
   };
 
-  const toggle = (email: string) => {
+  const toggle = async (email: string) => {
+    const ok = await confirm({ title: "تغییر وضعیت کاربر", message: `آیا مطمئن هستید وضعیت ${email} تغییر کند؟`, danger: true, confirmText: "تأیید" });
+    if (!ok) return;
     toggleActive(email);
     toast({ type: "info", title: "وضعیت کاربر تغییر کرد", message: email });
     addLog({ action: "TOGGLE_USER", message: `User ${email} active toggled`, actorEmail: actor?.email });

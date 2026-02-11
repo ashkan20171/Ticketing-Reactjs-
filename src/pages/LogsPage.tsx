@@ -3,8 +3,12 @@ import { Card } from "../shared/ui/Card/Card";
 import { Input } from "../shared/ui/Input/Input";
 import { Button } from "../shared/ui/Button/Button";
 import { useLogs } from "../app/providers/LogsProvider";
+import { useConfirm } from "../app/providers/ConfirmProvider";
+import { useToast } from "../app/providers/ToastProvider";
 
 export function LogsPage() {
+  const { confirm } = useConfirm();
+  const { toast } = useToast();
   const { logs, clear } = useLogs();
   const [q, setQ] = useState("");
 
@@ -26,7 +30,12 @@ export function LogsPage() {
               ثبت فعالیت‌های مهم سیستم (دمو - LocalStorage)
             </div>
           </div>
-          <Button variant="secondary" onClick={clear}>پاک کردن</Button>
+          <Button variant="danger" onClick={async () => {
+            const ok = await confirm({ title: "پاک کردن لاگ‌ها", message: "آیا مطمئن هستید؟ این عملیات برگشت‌پذیر نیست.", danger: true, confirmText: "پاک کن" });
+            if (!ok) return;
+            clear();
+            toast({ type: "success", title: "پاک شد" });
+          }}>پاک کردن</Button>
         </div>
       </Card>
 

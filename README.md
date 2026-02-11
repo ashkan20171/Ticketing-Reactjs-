@@ -1,11 +1,22 @@
-# Ashkan Ticketing v14 (Enterprise - Phase 16 Analytics)
+# Ashkan Ticketing v15 (Enterprise UX)
 
-## Added
-- Fixed AppRouter lazy-load syntax
-- ErrorBoundary wired in main.tsx
-- TopLoader wired to tickets loading
-- Advanced Analytics on Dashboard:
-  - Range filter (7/30/all)
-  - Animated Bar charts (status + departments)
-  - Animated Line chart (ticket creation trend)
-  - Pie chart ratio
+## New
+- Toast Queue (max 5, auto-dismiss)
+- Confirm Dialog System (promise-based)
+- Command Palette (Ctrl+K)
+  - Navigate: tickets/dashboard/settings/users/logs
+  - Toggle theme
+  - Create new ticket
+  - Logout with confirmation
+- Confirm integrated into:
+  - Clear logs
+  - Toggle user active
+
+
+## v16
+- Added My Dashboard for all users (/my-dashboard) with charts and range filter.
+
+
+## v16.1
+- Fixed user view: My Dashboard link visible for non-admin
+- Updated mock tickets to include user@example.com so list isn't empty

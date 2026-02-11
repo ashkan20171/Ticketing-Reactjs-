@@ -1,75 +1,70 @@
 import { useEffect } from "react";
 
-type Props = {
-  isOpen: boolean;
+export function Modal({
+  open,
+  title,
+  children,
+  footer,
+  onClose,
+  width = 520,
+}: {
+  open: boolean;
   title?: string;
-  onClose: () => void;
   children: React.ReactNode;
-};
-
-export function Modal({ isOpen, title, onClose, children }: Props) {
+  footer?: React.ReactNode;
+  onClose: () => void;
+  width?: number;
+}) {
   useEffect(() => {
-    if (!isOpen) return;
-    const onKeyDown = (e: KeyboardEvent) => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [isOpen, onClose]);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
 
-  if (!isOpen) return null;
+  if (!open) return null;
 
   return (
     <div
-      onMouseDown={onClose}
+      role="dialog"
+      aria-modal="true"
       style={{
         position: "fixed",
         inset: 0,
-        background: "rgba(0,0,0,0.55)",
+        zIndex: 9998,
+        background: "rgba(2,6,23,0.60)",
+        backdropFilter: "blur(6px)",
         display: "grid",
         placeItems: "center",
         padding: 16,
-        zIndex: 50,
+      }}
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onClose();
       }}
     >
       <div
-        onMouseDown={(e) => e.stopPropagation()}
         style={{
-          width: "min(760px, 100%)",
-          borderRadius: 18,
-          border: "1px solid rgba(255,255,255,0.10)",
-          background: "rgba(15, 26, 46, 0.92)",
-          boxShadow: "0 25px 60px rgba(0,0,0,0.55)",
+          width: "min(100%, " + width + "px)",
+          borderRadius: 20,
+          border: "1px solid var(--border)",
+          background: "rgba(17,24,39,0.85)",
+          boxShadow: "0 22px 70px rgba(0,0,0,0.35)",
           overflow: "hidden",
         }}
       >
-        <div
-          style={{
-            padding: 16,
-            borderBottom: "1px solid rgba(255,255,255,0.08)",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: 12,
-          }}
-        >
-          <div style={{ fontWeight: 900 }}>{title ?? "Modal"}</div>
-          <button
-            onClick={onClose}
-            style={{
-              border: "1px solid rgba(255,255,255,0.10)",
-              background: "rgba(255,255,255,0.05)",
-              color: "#e5e7eb",
-              borderRadius: 12,
-              padding: "8px 10px",
-              cursor: "pointer",
-            }}
-          >
-            بستن
-          </button>
-        </div>
+        {title ? (
+          <div style={{ padding: 14, borderBottom: "1px solid var(--border)", fontWeight: 900 }}>
+            {title}
+          </div>
+        ) : null}
 
-        <div style={{ padding: 16 }}>{children}</div>
+        <div style={{ padding: 14 }}>{children}</div>
+
+        {footer ? (
+          <div style={{ padding: 14, borderTop: "1px solid var(--border)" }}>{footer}</div>
+        ) : null}
       </div>
     </div>
   );

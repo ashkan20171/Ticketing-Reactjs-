@@ -3,6 +3,7 @@ import styles from "./AppLayout.module.css";
 import { getUser, logout } from "../../features/auth/model/auth";
 import { Button } from "../../shared/ui/Button/Button";
 import { TopLoader } from "../../shared/ui/TopLoader";
+import { CommandPalette } from "./CommandPalette";
 import { useTickets } from "./TicketsProvider";
 
 export function AppLayout() {
@@ -14,6 +15,7 @@ export function AppLayout() {
   return (
     <div className={styles.shell} dir="rtl">
       <TopLoader loading={ticketsLoading} />
+      <CommandPalette />
       <header className={styles.header}>
         <div className={styles.brand}>
           <span className={styles.logo}>A</span>
@@ -51,6 +53,9 @@ export function AppLayout() {
           <div className={styles.navTitle}>پنل</div>
           <NavLink to="/" end className={({ isActive }) => [styles.navItem, isActive ? styles.active : ""].join(" ")}>
             تیکت‌ها
+          </NavLink>
+          <NavLink to="/my-dashboard" className={({ isActive }) => [styles.navItem, isActive ? styles.active : ""].join(" ")}>
+            داشبورد من
           </NavLink>
 
           {isAdmin ? (
