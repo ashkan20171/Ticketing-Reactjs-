@@ -1,0 +1,26 @@
+.header {
+  padding: 40px 0 30px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 900;
+}
+
+.subtitle {
+  margin-top: 6px;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.main {
+  margin-top: 40px;
+}
