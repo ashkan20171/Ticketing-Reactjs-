@@ -5,7 +5,7 @@ export type TicketMessage = {
   id: string;
   author: "user" | "agent";
   text: string;
-  createdAt: string; // ISO
+  createdAt: string;
 };
 
 export type Ticket = {
@@ -17,4 +17,5 @@ export type Ticket = {
   createdAt: string;
   updatedAt: string;
   messages: TicketMessage[];
+  requesterEmail: string;
 };
