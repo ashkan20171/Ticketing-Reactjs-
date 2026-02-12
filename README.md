@@ -32,3 +32,11 @@
 ## v17.3
 - Login page: body grid collapses to single column (no empty sidebar space)
 - Main area centers content only on /login
+
+
+## v19
+- Enterprise SLA (Business hours + pause on pending + holidays)
+- SLA badge on ticket list
+- SLA KPIs on My Dashboard
+
+> Note: install chart dependency if needed: npm i recharts
