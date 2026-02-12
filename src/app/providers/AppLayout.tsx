@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import styles from "./AppLayout.module.css";
 import { getUser, logout } from "../../features/auth/model/auth";
 import { Button } from "../../shared/ui/Button/Button";
@@ -7,6 +7,9 @@ import { CommandPalette } from "./CommandPalette";
 import { useTickets } from "./TicketsProvider";
 
 export function AppLayout() {
+  const location = useLocation();
+  const isLogin = location.pathname === "/login";
+
   const { loading: ticketsLoading } = useTickets();
   const nav = useNavigate();
   const user = getUser();
@@ -48,7 +51,8 @@ export function AppLayout() {
         </div>
       </header>
 
-      <div className={styles.body}>
+      <div className={[styles.body, isLogin ? styles.bodyLogin : ""].join(" ")}>
+        {!isLogin ? (
         <aside className={styles.sidebar}>
           <div className={styles.navTitle}>پنل</div>
           <NavLink to="/" end className={({ isActive }) => [styles.navItem, isActive ? styles.active : ""].join(" ")}>
@@ -56,6 +60,9 @@ export function AppLayout() {
           </NavLink>
           <NavLink to="/my-dashboard" className={({ isActive }) => [styles.navItem, isActive ? styles.active : ""].join(" ")}>
             داشبورد من
+          </NavLink>
+          <NavLink to="/profile" className={({ isActive }) => [styles.navItem, isActive ? styles.active : ""].join(" ")}>
+            پروفایل
           </NavLink>
 
           {isAdmin ? (
@@ -79,8 +86,9 @@ export function AppLayout() {
             {isAdmin ? "مدیر سیستم: گزارش‌ها و خروجی‌ها" : "کاربر/اپراتور: مدیریت تیکت‌ها"}
           </div>
         </aside>
+      ) : null}
 
-        <main className={styles.main}>
+        <main className={[styles.main, isLogin ? styles.mainLogin : ""].join(" ")}>
           <Outlet />
         </main>
       </div>

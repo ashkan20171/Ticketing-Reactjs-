@@ -96,3 +96,13 @@
   font-size: 12px;
   line-height: 1.8;
 }
+
+
+.bodyLogin{
+  grid-template-columns: 1fr;
+}
+
+.mainLogin{
+  display: grid;
+  place-items: center;
+}

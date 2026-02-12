@@ -20,3 +20,15 @@
 ## v16.1
 - Fixed user view: My Dashboard link visible for non-admin
 - Updated mock tickets to include user@example.com so list isn't empty
+
+
+## v17
+- Login page: sidebar/panel hidden
+- Added Profile page (/profile) for all users (prefs + displayName)
+- Quick Stats on Tickets page (toggle via Profile)
+- UserPrefs persisted per-user in localStorage
+
+
+## v17.3
+- Login page: body grid collapses to single column (no empty sidebar space)
+- Main area centers content only on /login

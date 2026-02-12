@@ -32,6 +32,7 @@ export function CommandPalette() {
     const base: Cmd[] = [
       { id: "go_tickets", title: "رفتن به تیکت‌ها", hint: "G T", keywords: "tickets list", run: () => nav("/") },
       { id: "go_my_dashboard", title: "رفتن به داشبورد من", hint: "G M", keywords: "my dashboard analytics", run: () => nav("/my-dashboard") },
+      { id: "go_profile", title: "رفتن به پروفایل", hint: "G P", keywords: "profile prefs settings", run: () => nav("/profile") },
       { id: "new_ticket", title: "ایجاد تیکت جدید", hint: "N", keywords: "create ticket", run: () => (document.getElementById("btn-new-ticket") as HTMLButtonElement | null)?.click() },
       { id: "toggle_theme", title: settings.theme === "dark" ? "تغییر به Light" : "تغییر به Dark", hint: "T", keywords: "theme dark light", run: () => setTheme(settings.theme === "dark" ? "light" : "dark") },
       { id: "logout", title: "خروج از سیستم", hint: "L", keywords: "logout exit", run: async () => {

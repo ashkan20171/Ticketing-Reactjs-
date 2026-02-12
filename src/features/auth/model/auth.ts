@@ -5,6 +5,7 @@ export type AuthUser = {
   name: string;
   email: string;
   role: Role;
+  displayName?: string;
 };
 
 const KEY = "ashkan_auth_v1";
@@ -41,4 +42,12 @@ export async function login(email: string, password: string): Promise<AuthUser> 
 
   setUser(user);
   return user;
+}
+
+
+export function setUserDisplayName(displayName: string) {
+  const u = getUser();
+  if (!u) return;
+  const next = { ...u, displayName };
+  localStorage.setItem(KEY, JSON.stringify(next));
 }

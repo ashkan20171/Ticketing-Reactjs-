@@ -1,9 +1,10 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import React, { createContext, useContext, useMemo, useState } from "react";
 import { Ticket, TicketMessage, TicketStatus } from "../../shared/types/ticket";
 import { mockTickets } from "../../features/tickets/model/mockTickets";
 
 type Ctx = {
   tickets: Ticket[];
+  loading: boolean;
   addTicket: (t: Ticket) => void;
   setStatus: (id: string, status: TicketStatus, actor: "user" | "agent") => void;
   addMessage: (id: string, msg: TicketMessage) => void;
@@ -13,10 +14,18 @@ type Ctx = {
 const TicketsCtx = createContext<Ctx | null>(null);
 
 export function TicketsProvider({ children }: { children: React.ReactNode }) {
+  const [loading, setLoading] = useState<boolean>(true);
+  // Simulate initial fetch delay (mock)
+  React.useEffect(() => {
+    const t = window.setTimeout(() => setLoading(false), 250);
+    return () => window.clearTimeout(t);
+  }, []);
+
   const [tickets, setTickets] = useState<Ticket[]>(mockTickets);
 
   const api = useMemo<Ctx>(() => ({
     tickets,
+    loading,
     addTicket: (t) => setTickets((p) => [t, ...p]),
     getById: (id) => tickets.find((t) => t.id === id),
     addMessage: (id, msg) => {
@@ -43,7 +52,7 @@ export function TicketsProvider({ children }: { children: React.ReactNode }) {
         })
       );
     },
-  }), [tickets]);
+  }), [tickets, loading]);
 
   return <TicketsCtx.Provider value={api}>{children}</TicketsCtx.Provider>;
 }

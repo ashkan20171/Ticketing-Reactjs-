@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { AppLayout } from "../providers/AppLayout";
 import { TicketsPage } from "../../pages/TicketsPage";
 import { MyDashboardPage } from "../../pages/MyDashboardPage";
+import { ProfilePage } from "../../pages/ProfilePage";
 import { TicketDetailsPage } from "../../pages/TicketDetailsPage";
 import { NotFoundPage } from "../../pages/NotFoundPage";
 import React, { Suspense, lazy } from 'react';
@@ -25,6 +26,7 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <TicketsPage /> },
           { path: "my-dashboard", element: <MyDashboardPage /> },
+          { path: "profile", element: <ProfilePage /> },
           { path: "tickets/:id", element: <TicketDetailsPage /> },
           {
             element: <RequireAdmin />,

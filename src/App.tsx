@@ -7,6 +7,7 @@ import { SettingsProvider } from "./app/providers/SettingsProvider";
 import { LogsProvider } from "./app/providers/LogsProvider";
 import { UsersProvider } from "./app/providers/UsersProvider";
 import { ConfirmProvider } from "./app/providers/ConfirmProvider";
+import { UserPrefsProvider } from "./app/providers/UserPrefsProvider";
 
 export default function App() {
   return (
@@ -14,11 +15,13 @@ export default function App() {
       <LogsProvider>
         <UsersProvider>
           <ConfirmProvider>
+          <UserPrefsProvider>
           <SettingsProvider>
             <TicketsProvider>
               <AppRouter />
             </TicketsProvider>
           </SettingsProvider>
+          </UserPrefsProvider>
           </ConfirmProvider>
         </UsersProvider>
       </LogsProvider>
