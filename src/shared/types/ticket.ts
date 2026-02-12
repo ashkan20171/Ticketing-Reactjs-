@@ -3,7 +3,7 @@ export type TicketPriority = "low" | "normal" | "high" | "urgent";
 
 export type TicketMessage = {
   id: string;
-  author: "user" | "agent";
+  author: "user" | "agent" | "system";
   text: string;
   createdAt: string;
 };
@@ -16,6 +16,7 @@ export type Ticket = {
   priority: TicketPriority;
   createdAt: string;
   updatedAt: string;
+  firstResponseAt?: string;
   messages: TicketMessage[];
   requesterEmail: string;
 };

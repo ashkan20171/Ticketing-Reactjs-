@@ -6,6 +6,8 @@ type Ctx = {
   setSlaHours: (h: number) => void;
   setEmailNotifications: (v: boolean) => void;
   setTheme: (t: ThemeMode) => void;
+  setSlaPolicy: (p: AppSettings["slaPolicy"]) => void;
+  setWorkCalendar: (c: AppSettings["workCalendar"]) => void;
 };
 
 const SettingsCtx = createContext<Ctx | null>(null);
@@ -24,6 +26,8 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     setSlaHours: (h) => setSettings((p) => ({ ...p, slaHours: h })),
     setEmailNotifications: (v) => setSettings((p) => ({ ...p, emailNotifications: v })),
     setTheme: (t) => setSettings((p) => ({ ...p, theme: t })),
+    setSlaPolicy: (pcy) => setSettings((p) => ({ ...p, slaPolicy: pcy })),
+    setWorkCalendar: (cal) => setSettings((p) => ({ ...p, workCalendar: cal })),
   }), [settings]);
 
   return <SettingsCtx.Provider value={api}>{children}</SettingsCtx.Provider>;

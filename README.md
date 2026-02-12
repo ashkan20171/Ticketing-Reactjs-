@@ -40,3 +40,26 @@
 - SLA KPIs on My Dashboard
 
 > Note: install chart dependency if needed: npm i recharts
+
+
+## v20
+- Settings UI: Enterprise SLA policy editor + working calendar + holidays
+- SettingsProvider supports slaPolicy/workCalendar updates
+
+
+## v21
+- Ticket Details: Enterprise SLA widget (countdown + progress)
+- Timeline widget
+- mockTickets now include messages + timestamps + priority
+
+
+## v22
+- Auto SLA monitoring (every 5s)
+- Notifications (toast) for at-risk and breached
+- Auto escalation on breach (priority bump + system message + audit log)
+
+
+## v23
+- Notification Center (bell + unread badge + dropdown)
+- Notifications persisted in localStorage
+- SLA monitor pushes notifications (at-risk & breached)

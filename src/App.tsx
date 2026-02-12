@@ -8,6 +8,7 @@ import { LogsProvider } from "./app/providers/LogsProvider";
 import { UsersProvider } from "./app/providers/UsersProvider";
 import { ConfirmProvider } from "./app/providers/ConfirmProvider";
 import { UserPrefsProvider } from "./app/providers/UserPrefsProvider";
+import { NotificationsProvider } from "./app/providers/NotificationsProvider";
 
 export default function App() {
   return (
@@ -17,9 +18,11 @@ export default function App() {
           <ConfirmProvider>
           <UserPrefsProvider>
           <SettingsProvider>
+            <NotificationsProvider>
             <TicketsProvider>
               <AppRouter />
             </TicketsProvider>
+            </NotificationsProvider>
           </SettingsProvider>
           </UserPrefsProvider>
           </ConfirmProvider>
