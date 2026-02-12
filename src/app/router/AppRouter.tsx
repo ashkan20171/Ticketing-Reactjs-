@@ -11,6 +11,7 @@ const DashboardPage = lazy(()=>import('../../pages/DashboardPage').then(m=>({def
 import { SettingsPage } from "../../pages/SettingsPage";
 import { UsersPage } from "../../pages/UsersPage";
 import { LogsPage } from "../../pages/LogsPage";
+import { EscalationsPage } from "../../pages/EscalationsPage";
 import { RequireAdmin } from "../../features/auth/ui/RequireAdmin";
 import { LoginPage } from "../../pages/LoginPage";
 import { RequireAuth } from "../../features/auth/ui/RequireAuth";
@@ -35,6 +36,7 @@ const router = createBrowserRouter([
               { path: "settings", element: <SettingsPage /> },
               { path: "users", element: <UsersPage /> },
               { path: "logs", element: <LogsPage /> },
+              { path: "escalations", element: <EscalationsPage /> },
             ],
           },
         ],

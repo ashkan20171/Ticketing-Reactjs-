@@ -142,6 +142,9 @@ export function AppLayout() {
               <NavLink to="/logs" className={({ isActive }) => [styles.navItem, isActive ? styles.active : ""].join(" ")}>
                 لاگ‌ها
               </NavLink>
+              <NavLink to="/escalations" className={({ isActive }) => [styles.navItem, isActive ? styles.active : ""].join(" ")}>
+                قوانین Escalation
+              </NavLink>
             </>
           ) : null}
 

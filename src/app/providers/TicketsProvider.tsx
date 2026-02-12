@@ -4,6 +4,7 @@ import { useSettings } from "./SettingsProvider";
 import { useToast } from "./ToastProvider";
 import { useLogs } from "./LogsProvider";
 import { useNotifications } from "./NotificationsProvider";
+import { useEscalationRules } from "./EscalationRulesProvider";
 import { getUser } from "../../features/auth/model/auth";
 import { Ticket, TicketMessage, TicketStatus } from "../../shared/types/ticket";
 import { mockTickets } from "../../features/tickets/model/mockTickets";
@@ -16,7 +17,6 @@ type Ctx = {
   addMessage: (id: string, msg: TicketMessage) => void;
   getById: (id: string) => Ticket | undefined;
 };
-
 
 function nextPriority(p: Ticket["priority"]): Ticket["priority"] {
   if (p === "low") return "normal";
@@ -36,6 +36,7 @@ const TicketsCtx = createContext<Ctx | null>(null);
 
 export function TicketsProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState<boolean>(true);
+
   // Simulate initial fetch delay (mock)
   React.useEffect(() => {
     const t = window.setTimeout(() => setLoading(false), 250);
@@ -48,16 +49,20 @@ export function TicketsProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
   const { addLog } = useLogs();
   const { push } = useNotifications();
+  const { rules } = useEscalationRules();
   const actor = getUser();
 
   // prevent toast spam across re-renders
   const notifiedRef = useRef<Record<string, { atRisk?: boolean; breached?: boolean }>>({});
 
   React.useEffect(() => {
+    if (!rules.enabled) return;
+
     const interval = window.setInterval(() => {
       setTickets((prev) => {
         let changed = false;
-        const next = prev.map((t) => {
+
+        const next: Ticket[] = prev.map((t) => {
           if (t.status === "closed") return t;
 
           const sla = computeSlaState({
@@ -73,21 +78,38 @@ export function TicketsProvider({ children }: { children: React.ReactNode }) {
           const seen = notifiedRef.current[key] ?? {};
           const worst = Math.min(sla.firstResponseRemainingMs, sla.resolutionRemainingMs);
 
+          const firstTotal = settings.slaPolicy[t.priority].firstResponseMinutes * 60000;
+          const resTotal = settings.slaPolicy[t.priority].resolutionMinutes * 60000;
+
+          const firstRisk =
+            !sla.firstResponseBreached &&
+            sla.firstResponseRemainingMs / Math.max(firstTotal, 1) <= rules.atRiskThresholdPct;
+
+          const resRisk =
+            !sla.resolutionBreached &&
+            sla.resolutionRemainingMs / Math.max(resTotal, 1) <= rules.atRiskThresholdPct;
+
+          const isAtRisk =
+            (firstRisk || resRisk) && !sla.firstResponseBreached && !sla.resolutionBreached;
+
           // At risk notification (once)
-          if (sla.atRisk && !seen.atRisk && !sla.firstResponseBreached && !sla.resolutionBreached) {
+          if (rules.notifyAtRisk && isAtRisk && !seen.atRisk) {
             notifiedRef.current[key] = { ...seen, atRisk: true };
+
             toast({
               type: "warn",
               title: "SLA در خطر",
               message: `${t.id} • ${t.title} • باقی‌مانده: ${formatDuration(worst)}`,
               ttlMs: 5200,
             });
+
             push({
               type: "warn",
               title: "SLA در خطر",
               message: `${t.id} • ${t.title} • باقی‌مانده: ${formatDuration(worst)}`,
               href: `/tickets/${t.id}`,
             });
+
             addLog({
               level: "warn",
               action: "SLA_AT_RISK",
@@ -97,45 +119,57 @@ export function TicketsProvider({ children }: { children: React.ReactNode }) {
           }
 
           const breached = sla.firstResponseBreached || sla.resolutionBreached;
+
+          // Breach notification + optional auto escalation (once)
           if (breached && !seen.breached) {
             notifiedRef.current[key] = { ...seen, breached: true };
 
-            // auto escalation: bump priority (unless urgent) + add system message
-            const newP = nextPriority(t.priority);
+            const doEscalate = rules.autoEscalateOnBreach;
+            const newP = doEscalate ? nextPriority(t.priority) : t.priority;
             const nowIso = new Date().toISOString();
+
             const msgText =
               newP !== t.priority
                 ? `⛔ SLA نقض شد. اولویت به «${prioFa(newP)}» افزایش یافت. (${formatDuration(worst)})`
                 : `⛔ SLA نقض شد. (${formatDuration(worst)})`;
 
-            toast({
-              type: "error",
-              title: "SLA نقض شد",
-              message: `${t.id} • ${t.title} • ${msgText}`,
-              ttlMs: 6200,
-            });
-            push({
-              type: "error",
-              title: "SLA نقض شد",
-              message: `${t.id} • ${t.title} • ${msgText}`,
-              href: `/tickets/${t.id}`,
-            });
-            addLog({
-              level: "error",
-              action: "SLA_BREACHED",
-              message: `SLA breached for ${t.id} (${t.title}). ${msgText}`,
-              actorEmail: actor?.email,
-            });
+            if (rules.notifyBreach) {
+              toast({
+                type: "error",
+                title: "SLA نقض شد",
+                message: `${t.id} • ${t.title} • ${msgText}`,
+                ttlMs: 6200,
+              });
+
+              push({
+                type: "error",
+                title: "SLA نقض شد",
+                message: `${t.id} • ${t.title} • ${msgText}`,
+                href: `/tickets/${t.id}`,
+              });
+
+              addLog({
+                level: "error",
+                action: "SLA_BREACHED",
+                message: `SLA breached for ${t.id} (${t.title}). ${msgText}`,
+                actorEmail: actor?.email,
+              });
+            }
 
             changed = true;
+
+            const sysMsg: TicketMessage = {
+              id: `m-${Date.now()}`,
+              author: "system" as const,
+              text: msgText,
+              createdAt: nowIso,
+            };
+
             return {
               ...t,
               priority: newP,
               updatedAt: nowIso,
-              messages: [
-                ...t.messages,
-                { id: `m-${Date.now()}`, author: "system", text: msgText, createdAt: nowIso },
-              ],
+              messages: [...t.messages, sysMsg],
             };
           }
 
@@ -144,42 +178,46 @@ export function TicketsProvider({ children }: { children: React.ReactNode }) {
 
         return changed ? next : prev;
       });
-    }, 5000); // check every 5s
+    }, rules.checkIntervalMs);
 
     return () => window.clearInterval(interval);
-  }, [settings, toast, addLog, push, actor]);
+  }, [settings, rules, toast, addLog, push, actor]);
 
+  const api = useMemo<Ctx>(
+    () => ({
+      tickets,
+      loading,
+      addTicket: (t) => setTickets((p) => [t, ...p]),
+      getById: (id) => tickets.find((t) => t.id === id),
+      addMessage: (id, msg) => {
+        setTickets((p) =>
+          p.map((t) =>
+            t.id === id
+              ? { ...t, updatedAt: new Date().toISOString(), messages: [...t.messages, msg] }
+              : t
+          )
+        );
+      },
+      setStatus: (id, status, actorRole) => {
+        setTickets((p) =>
+          p.map((t) => {
+            if (t.id !== id) return t;
+            const now = new Date().toISOString();
 
-  const api = useMemo<Ctx>(() => ({
-    tickets,
-    loading,
-    addTicket: (t) => setTickets((p) => [t, ...p]),
-    getById: (id) => tickets.find((t) => t.id === id),
-    addMessage: (id, msg) => {
-      setTickets((p) =>
-        p.map((t) =>
-          t.id === id
-            ? { ...t, updatedAt: new Date().toISOString(), messages: [...t.messages, msg] }
-            : t
-        )
-      );
-    },
-    setStatus: (id, status, actor) => {
-      setTickets((p) =>
-        p.map((t) => {
-          if (t.id !== id) return t;
-          const now = new Date().toISOString();
-          const sysMsg: TicketMessage = {
-            id: `m-${Date.now()}`,
-            author: actor,
-            text: `وضعیت تیکت به «${status}» تغییر کرد.`,
-            createdAt: now,
-          };
-          return { ...t, status, updatedAt: now, messages: [...t.messages, sysMsg] };
-        })
-      );
-    },
-  }), [tickets, loading]);
+            const sysMsg: TicketMessage = {
+              id: `m-${Date.now()}`,
+              author: actorRole, // "user" | "agent"
+              text: `وضعیت تیکت به «${status}» تغییر کرد.`,
+              createdAt: now,
+            };
+
+            return { ...t, status, updatedAt: now, messages: [...t.messages, sysMsg] };
+          })
+        );
+      },
+    }),
+    [tickets, loading]
+  );
 
   return <TicketsCtx.Provider value={api}>{children}</TicketsCtx.Provider>;
 }

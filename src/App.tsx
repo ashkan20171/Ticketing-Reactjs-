@@ -9,6 +9,7 @@ import { UsersProvider } from "./app/providers/UsersProvider";
 import { ConfirmProvider } from "./app/providers/ConfirmProvider";
 import { UserPrefsProvider } from "./app/providers/UserPrefsProvider";
 import { NotificationsProvider } from "./app/providers/NotificationsProvider";
+import { EscalationRulesProvider } from "./app/providers/EscalationRulesProvider";
 
 export default function App() {
   return (
@@ -19,9 +20,11 @@ export default function App() {
           <UserPrefsProvider>
           <SettingsProvider>
             <NotificationsProvider>
+            <EscalationRulesProvider>
             <TicketsProvider>
               <AppRouter />
             </TicketsProvider>
+            </EscalationRulesProvider>
             </NotificationsProvider>
           </SettingsProvider>
           </UserPrefsProvider>

@@ -63,3 +63,8 @@
 - Notification Center (bell + unread badge + dropdown)
 - Notifications persisted in localStorage
 - SLA monitor pushes notifications (at-risk & breached)
+
+
+## v24
+- Admin Escalation Rules Panel (/escalations)
+- SLA monitor configurable (interval, at-risk threshold, notify toggles, auto-escalate)
