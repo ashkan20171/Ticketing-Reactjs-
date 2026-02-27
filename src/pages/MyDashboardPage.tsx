@@ -1,4 +1,5 @@
 import React from "react";
+import { useI18n } from "../app/providers/I18nProvider";
 import { Card } from "../shared/ui/Card/Card";
 import { Button } from "../shared/ui/Button/Button";
 import { useTickets } from "../app/providers/TicketsProvider";
@@ -16,6 +17,7 @@ function isSlaBreached(t: Ticket, slaHours: number) {
 }
 
 export function MyDashboardPage() {
+  const { t, lang } = useI18n();
   const [range, setRange] = React.useState<"7" | "30" | "all">("30");
   const { tickets } = useTickets();
   const { settings } = useSettings();
@@ -66,7 +68,7 @@ export function MyDashboardPage() {
       const key = d.toISOString().slice(0, 10);
       const count = visibleTickets.filter((t) => t.createdAt.slice(0, 10) === key).length;
       list.push({
-        label: d.toLocaleDateString("fa-IR", { month: "2-digit", day: "2-digit" }),
+        label: d.toLocaleDateString(lang === "fa" ? "fa-IR" : "en-US", { month: "2-digit", day: "2-digit" }),
         value: count,
       });
     }
@@ -113,7 +115,7 @@ export function MyDashboardPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
         <Card>
-          <LineChart title="روند ایجاد تیکت‌های شما" series={trend} />
+          <LineChart title={t("روند ایجاد تیکت‌های شما")} series={trend} />
         </Card>
         <Card>
           <div style={{ fontWeight: 900, marginBottom: 10 }}>نسبت وضعیت‌ها</div>
@@ -131,17 +133,17 @@ export function MyDashboardPage() {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
         <Card>
           <BarChart
-            title="تیکت‌ها بر اساس دپارتمان"
+            title={t("تیکت‌ها بر اساس دپارتمان")}
             items={[
-              { label: "فنی", value: stats.byDept["فنی"] },
-              { label: "مالی", value: stats.byDept["مالی"] },
-              { label: "فروش", value: stats.byDept["فروش"] },
+              { label: t("فنی"), value: stats.byDept["فنی"] },
+              { label: t("مالی"), value: stats.byDept["مالی"] },
+              { label: t("فروش"), value: stats.byDept["فروش"] },
             ]}
           />
         </Card>
         <Card>
           <BarChart
-            title="اولویت‌ها"
+            title={t("اولویت‌ها")}
             items={[
               { label: "Low", value: stats.byPriority.low },
               { label: "Normal", value: stats.byPriority.normal },

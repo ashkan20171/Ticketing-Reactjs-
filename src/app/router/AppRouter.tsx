@@ -3,6 +3,7 @@ import { AppLayout } from "../providers/AppLayout";
 import { TicketsPage } from "../../pages/TicketsPage";
 import { MyDashboardPage } from "../../pages/MyDashboardPage";
 import { ProfilePage } from "../../pages/ProfilePage";
+import { HelpPage } from "../../pages/HelpPage";
 import { TicketDetailsPage } from "../../pages/TicketDetailsPage";
 import { NotFoundPage } from "../../pages/NotFoundPage";
 import React, { Suspense, lazy } from 'react';
@@ -28,6 +29,7 @@ const router = createBrowserRouter([
           { index: true, element: <TicketsPage /> },
           { path: "my-dashboard", element: <MyDashboardPage /> },
           { path: "profile", element: <ProfilePage /> },
+          { path: "help", element: <HelpPage /> },
           { path: "tickets/:id", element: <TicketDetailsPage /> },
           {
             element: <RequireAdmin />,

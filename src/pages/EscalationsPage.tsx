@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useI18n } from "../app/providers/I18nProvider";
 import { Card } from "../shared/ui/Card/Card";
 import { Button } from "../shared/ui/Button/Button";
 import { useToast } from "../app/providers/ToastProvider";
@@ -11,6 +12,7 @@ function clamp(n: number, min: number, max: number) {
 }
 
 export function EscalationsPage() {
+  const { t } = useI18n();
   const { toast } = useToast();
   const { addLog } = useLogs();
   const actor = getUser();

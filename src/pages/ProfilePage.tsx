@@ -1,4 +1,5 @@
 import React from "react";
+import { useI18n } from "../app/providers/I18nProvider";
 import { Card } from "../shared/ui/Card/Card";
 import { Button } from "../shared/ui/Button/Button";
 import { Input } from "../shared/ui/Input/Input";
@@ -44,6 +45,7 @@ function Switch({ checked, onChange, label, hint }: { checked: boolean; onChange
 }
 
 export function ProfilePage() {
+  const { t } = useI18n();
   const user = getUser();
   const { prefs, patch } = useUserPrefs();
   const { toast } = useToast();
@@ -72,7 +74,7 @@ export function ProfilePage() {
       <Card>
         <div style={{ fontWeight: 900, marginBottom: 10 }}>اطلاعات پایه</div>
         <div style={{ display: "grid", gap: 10, maxWidth: 520 }}>
-          <Input label="نام نمایشی" placeholder="مثلاً اشکان" value={name} onChange={(e) => setName(e.target.value)} />
+          <Input label={t("نام نمایشی")} placeholder={t("مثلاً اشکان")} value={name} onChange={(e) => setName(e.target.value)} />
           <div style={{ display: "flex", gap: 10 }}>
             <Button
               variant="secondary"

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useI18n } from "../app/providers/I18nProvider";
 import { Card } from "../shared/ui/Card/Card";
 import { Input } from "../shared/ui/Input/Input";
 import { Button } from "../shared/ui/Button/Button";
@@ -10,6 +11,7 @@ import { getUser } from "../features/auth/model/auth";
 import { Role } from "../features/auth/model/auth";
 
 export function UsersPage() {
+  const { t } = useI18n();
   const { confirm } = useConfirm();
   const { users, setRole, toggleActive } = useUsers();
   const { toast } = useToast();
@@ -31,7 +33,7 @@ export function UsersPage() {
   };
 
   const toggle = async (email: string) => {
-    const ok = await confirm({ title: "تغییر وضعیت کاربر", message: `آیا مطمئن هستید وضعیت ${email} تغییر کند؟`, danger: true, confirmText: "تأیید" });
+    const ok = await confirm({ title: t("تغییر وضعیت کاربر"), message: `آیا مطمئن هستید وضعیت ${email} تغییر کند؟`, danger: true, confirmText: t("تأیید") });
     if (!ok) return;
     toggleActive(email);
     toast({ type: "info", title: "وضعیت کاربر تغییر کرد", message: email });
@@ -48,7 +50,7 @@ export function UsersPage() {
       </Card>
 
       <Card>
-        <Input placeholder="جستجو نام یا ایمیل..." value={q} onChange={(e)=>setQ(e.target.value)} />
+        <Input placeholder={t("جستجو نام یا ایمیل...")} value={q} onChange={(e)=>setQ(e.target.value)} />
       </Card>
 
       <Card>
@@ -81,7 +83,7 @@ export function UsersPage() {
                   color: "var(--text)"
                 }}
                 disabled={u.email === "admin@example.com"}
-                title={u.email === "admin@example.com" ? "ادمین اصلی قابل تغییر نیست" : ""}
+                title={u.email === "admin@example.com" ? t("ادمین اصلی قابل تغییر نیست") : ""}
               >
                 <option value="user">user</option>
                 <option value="agent">agent</option>

@@ -13,7 +13,33 @@ body {
 a { color: inherit; text-decoration: none; }
 button, input, textarea, select { font: inherit; }
 
+/* Accessibility: visible focus ring */
+:focus { outline: none; }
+:focus-visible {
+  box-shadow: var(--ring);
+  border-radius: 12px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * { scroll-behavior: auto !important; }
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+}
+
 
 @keyframes dash {
   to { stroke-dashoffset: 0; }
+}
+
+
+/* Skeleton shimmer */
+.sk{
+  background: linear-gradient(90deg, rgba(255,255,255,0.05), rgba(255,255,255,0.10), rgba(255,255,255,0.05));
+  background-size: 200% 100%;
+  animation: sk 1.2s ease-in-out infinite;
+  border: 1px solid var(--border);
+}
+@keyframes sk{
+  0%{ background-position: 200% 0; }
+  100%{ background-position: -200% 0; }
 }

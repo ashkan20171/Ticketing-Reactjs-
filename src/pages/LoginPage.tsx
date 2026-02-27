@@ -6,11 +6,13 @@ import { Button } from "../shared/ui/Button/Button";
 import { login } from "../features/auth/model/auth";
 import { useLogs } from "../app/providers/LogsProvider";
 import { useToast } from "../app/providers/ToastProvider";
+import { useI18n } from "../app/providers/I18nProvider";
 
 export function LoginPage() {
   const { addLog } = useLogs();
   const { toast } = useToast();
   const nav = useNavigate();
+  const { t, dir } = useI18n();
 
   const [email, setEmail] = useState("admin@example.com");
   const [password, setPassword] = useState("1234");
@@ -29,8 +31,8 @@ export function LoginPage() {
 
       toast({
         type: "success",
-        title: "ورود موفق",
-        message: "خوش آمدید"
+        title: t("ورود موفق"),
+        message: t("خوش آمدید")
       });
 
       nav("/", { replace: true });
@@ -47,7 +49,7 @@ export function LoginPage() {
 
       toast({
         type: "error",
-        title: "خطا در ورود",
+        title: t("خطا در ورود"),
         message: e.message
       });
     }
@@ -55,6 +57,7 @@ export function LoginPage() {
 
   return (
     <div
+      dir={dir}
       style={{
         minHeight: "100vh",
         display: "grid",
@@ -64,7 +67,7 @@ export function LoginPage() {
     >
       <Card>
         <div style={{ display: "grid", gap: 16, width: 300 }}>
-          <h2 style={{ textAlign: "center" }}>ورود به سیستم</h2>
+          <h2 style={{ textAlign: "center" }}>{t("ورود به سیستم")}</h2>
 
           {error && (
             <div style={{ color: "#ff6b6b", fontSize: 13 }}>
@@ -73,13 +76,13 @@ export function LoginPage() {
           )}
 
           <Input
-            label="ایمیل"
+            label={t("ایمیل")}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
 
           <Input
-            label="رمز عبور"
+            label={t("رمز عبور")}
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useI18n } from "../app/providers/I18nProvider";
 import { Card } from "../shared/ui/Card/Card";
 import { Button } from "../shared/ui/Button/Button";
 import { useToast } from "../app/providers/ToastProvider";
@@ -23,6 +24,7 @@ function safeNum(v: string) {
 }
 
 export function SettingsPage() {
+  const { t } = useI18n();
   const { addLog } = useLogs();
   const actor = getUser();
   const { toast } = useToast();
@@ -39,7 +41,7 @@ export function SettingsPage() {
 
   const saveLegacySlaHours = () => {
     setSlaHours(slaParsed);
-    toast({ type: "success", title: "ذخیره شد", message: "تنظیمات SLA (قدیمی) ذخیره شد." });
+    toast({ type: "success", title: t("ذخیره شد"), message: t("تنظیمات SLA (قدیمی) ذخیره شد.") });
     addLog({ action: "UPDATE_SETTINGS", message: `SLA hours set to ${slaParsed}`, actorEmail: actor?.email });
   };
 
@@ -61,7 +63,7 @@ export function SettingsPage() {
     setSlaPolicy(policyDraft);
     setWorkCalendar(nextCal);
 
-    toast({ type: "success", title: "ذخیره شد", message: "SLA Enterprise و تقویم کاری ذخیره شد." });
+    toast({ type: "success", title: t("ذخیره شد"), message: t("SLA Enterprise و تقویم کاری ذخیره شد.") });
     addLog({ action: "UPDATE_SETTINGS", message: `SLA policy/calendar updated`, actorEmail: actor?.email });
   };
 
@@ -101,11 +103,11 @@ export function SettingsPage() {
   return (
     <div style={{ padding: 12, display: "grid", gap: 12, maxWidth: 980 }}>
       <Card>
-        <div style={{ fontWeight: 900, fontSize: 16 }}>تنظیمات سیستم</div>
+        <div style={{ fontWeight: 900, fontSize: 16 }}>{t("تنظیمات سیستم")}</div>
         <div style={{ marginTop: 6, color: "var(--muted)", fontSize: 13, lineHeight: 1.8 }}>
           این تنظیمات محلی هستند (LocalStorage) و برای نسخه‌ی بک‌اند آماده‌اند.
           <br />
-          SLA Enterprise بر اساس <b>ساعات کاری</b> محاسبه می‌شود و در وضعیت <b>در انتظار (Pending)</b> متوقف می‌شود.
+          SLA Enterprise بر اساس <b>{t("ساعات کاری")}</b> محاسبه می‌شود و در وضعیت <b>{t("در انتظار (Pending)")}</b> متوقف می‌شود.
         </div>
       </Card>
 
@@ -114,7 +116,7 @@ export function SettingsPage() {
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 220px", gap: 12, alignItems: "end" }}>
           <label style={{ display: "grid", gap: 6 }}>
-            <span style={{ fontSize: 13, color: "var(--muted)" }}>حداکثر ساعت مجاز برای تیکت‌های باز</span>
+            <span style={{ fontSize: 13, color: "var(--muted)" }}>{t("حداکثر ساعت مجاز برای تیکت‌های باز")}</span>
             <input
               value={slaInput}
               onChange={(e) => setSlaInput(e.target.value)}
@@ -127,14 +129,14 @@ export function SettingsPage() {
                 color: "var(--text)",
                 outline: "none",
               }}
-              placeholder="مثلاً 24"
+              placeholder={t("مثلاً 24")}
             />
             <span style={{ fontSize: 12, color: "var(--muted)" }}>
               بازه مجاز: 1 تا 168 ساعت. مقدار اعمال‌شده: <b>{slaParsed}</b>
             </span>
           </label>
 
-          <Button variant="secondary" onClick={saveLegacySlaHours}>ذخیره SLA</Button>
+          <Button variant="secondary" onClick={saveLegacySlaHours}>{t("ذخیره SLA")}</Button>
         </div>
       </Card>
 
@@ -144,7 +146,7 @@ export function SettingsPage() {
         <div style={{ display: "grid", gap: 12 }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             <label style={{ display: "grid", gap: 6 }}>
-              <span style={{ fontSize: 13, color: "var(--muted)" }}>ساعت شروع روز کاری</span>
+              <span style={{ fontSize: 13, color: "var(--muted)" }}>{t("ساعت شروع روز کاری")}</span>
               <input
                 value={calendarDraft.startHour}
                 onChange={(e) => setCalendarDraft((c) => ({ ...c, startHour: safeNum(e.target.value) }))}
@@ -162,7 +164,7 @@ export function SettingsPage() {
             </label>
 
             <label style={{ display: "grid", gap: 6 }}>
-              <span style={{ fontSize: 13, color: "var(--muted)" }}>ساعت پایان روز کاری</span>
+              <span style={{ fontSize: 13, color: "var(--muted)" }}>{t("ساعت پایان روز کاری")}</span>
               <input
                 value={calendarDraft.endHour}
                 onChange={(e) => setCalendarDraft((c) => ({ ...c, endHour: safeNum(e.target.value) }))}
@@ -181,7 +183,7 @@ export function SettingsPage() {
           </div>
 
           <div>
-            <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 8 }}>روزهای کاری</div>
+            <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 8 }}>{t("روزهای کاری")}</div>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               {[6, 0, 1, 2, 3, 4, 5].map((d) => {
                 const active = calendarDraft.workingDays.includes(d);
@@ -201,7 +203,7 @@ export function SettingsPage() {
                       fontSize: 12,
                     }}
                   >
-                    {daysFa[d]}
+                    {t(daysFa[d])}
                   </button>
                 );
               })}
@@ -214,16 +216,16 @@ export function SettingsPage() {
               checked={calendarDraft.pauseOnPending}
               onChange={(e) => setCalendarDraft((c) => ({ ...c, pauseOnPending: e.target.checked }))}
             />
-            <span style={{ color: "var(--text)" }}>توقف SLA در وضعیت «در انتظار»</span>
+            <span style={{ color: "var(--text)" }}>{t("توقف SLA در وضعیت «در انتظار»")}</span>
           </label>
 
           <div style={{ display: "grid", gap: 8 }}>
-            <div style={{ fontSize: 13, color: "var(--muted)" }}>تعطیلات (YYYY-MM-DD)</div>
+            <div style={{ fontSize: 13, color: "var(--muted)" }}>{t("تعطیلات (YYYY-MM-DD)")}</div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 180px", gap: 10, alignItems: "end" }}>
               <input
                 value={holidayInput}
                 onChange={(e) => setHolidayInput(e.target.value)}
-                placeholder="مثلاً 2026-03-21"
+                placeholder={t("مثلاً 2026-03-21")}
                 style={{
                   padding: "10px 12px",
                   borderRadius: 14,
@@ -233,12 +235,12 @@ export function SettingsPage() {
                   outline: "none",
                 }}
               />
-              <Button variant="secondary" onClick={addHoliday}>افزودن تعطیلی</Button>
+              <Button variant="secondary" onClick={addHoliday}>{t("افزودن تعطیلی")}</Button>
             </div>
 
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               {calendarDraft.holidays.length === 0 ? (
-                <span style={{ color: "var(--muted)", fontSize: 12 }}>تعطیلی ثبت نشده</span>
+                <span style={{ color: "var(--muted)", fontSize: 12 }}>{t("تعطیلی ثبت نشده")}</span>
               ) : (
                 calendarDraft.holidays.map((h) => (
                   <span
@@ -279,13 +281,13 @@ export function SettingsPage() {
           </div>
 
           <div style={{ borderTop: "1px solid var(--border)", paddingTop: 12 }}>
-            <div style={{ fontWeight: 900, marginBottom: 8 }}>Policy (دقیقه)</div>
+            <div style={{ fontWeight: 900, marginBottom: 8 }}>{t("Policy (دقیقه)")}</div>
 
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 0 }}>
                 <thead>
                   <tr>
-                    <th style={{ textAlign: "right", padding: "10px 8px", color: "var(--muted)", fontSize: 12 }}>اولویت</th>
+                    <th style={{ textAlign: "right", padding: "10px 8px", color: "var(--muted)", fontSize: 12 }}>{t("اولویت")}</th>
                     <th style={{ textAlign: "right", padding: "10px 8px", color: "var(--muted)", fontSize: 12 }}>First Response (min)</th>
                     <th style={{ textAlign: "right", padding: "10px 8px", color: "var(--muted)", fontSize: 12 }}>Resolution (min)</th>
                   </tr>
@@ -333,14 +335,14 @@ export function SettingsPage() {
             </div>
 
             <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
-              <Button variant="secondary" onClick={saveEnterpriseSla}>ذخیره SLA Enterprise</Button>
+              <Button variant="secondary" onClick={saveEnterpriseSla}>{t("ذخیره SLA Enterprise")}</Button>
             </div>
           </div>
         </div>
       </Card>
 
       <Card>
-        <div style={{ fontWeight: 900, marginBottom: 10 }}>اعلان‌ها (Mock)</div>
+        <div style={{ fontWeight: 900, marginBottom: 10 }}>{t("اعلان‌ها (Mock)")}</div>
         <label style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <input
             type="checkbox"
@@ -350,23 +352,23 @@ export function SettingsPage() {
               toast({
                 type: "info",
                 title: "اعلان‌ها",
-                message: e.target.checked ? "اعلان ایمیلی فعال شد (دمو)" : "اعلان ایمیلی غیرفعال شد (دمو)",
+                message: e.target.checked ? t("اعلان ایمیلی فعال شد (دمو)") : t("اعلان ایمیلی غیرفعال شد (دمو)"),
               });
               addLog({ action: "TOGGLE_EMAIL_NOTIF", message: `Email notifications: ${e.target.checked}`, actorEmail: actor?.email });
             }}
           />
-          <span style={{ color: "var(--text)" }}>فعال‌سازی اعلان ایمیلی</span>
+          <span style={{ color: "var(--text)" }}>{t("فعال‌سازی اعلان ایمیلی")}</span>
         </label>
       </Card>
 
       <Card>
-        <div style={{ fontWeight: 900, marginBottom: 10 }}>ظاهر (Theme)</div>
+        <div style={{ fontWeight: 900, marginBottom: 10 }}>{t("ظاهر (Theme)")}</div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <Button
             variant={settings.theme === "dark" ? "secondary" : "ghost"}
             onClick={() => {
               setTheme("dark");
-              toast({ type: "success", title: "تم تغییر کرد", message: "Dark فعال شد." });
+              toast({ type: "success", title: t("تم تغییر کرد"), message: t("Dark فعال شد.") });
               addLog({ action: "CHANGE_THEME", message: "Theme set to dark", actorEmail: actor?.email });
             }}
           >
@@ -377,7 +379,7 @@ export function SettingsPage() {
             variant={settings.theme === "light" ? "secondary" : "ghost"}
             onClick={() => {
               setTheme("light");
-              toast({ type: "success", title: "تم تغییر کرد", message: "Light فعال شد." });
+              toast({ type: "success", title: t("تم تغییر کرد"), message: t("Light فعال شد.") });
               addLog({ action: "CHANGE_THEME", message: "Theme set to light", actorEmail: actor?.email });
             }}
           >

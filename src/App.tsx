@@ -10,10 +10,12 @@ import { ConfirmProvider } from "./app/providers/ConfirmProvider";
 import { UserPrefsProvider } from "./app/providers/UserPrefsProvider";
 import { NotificationsProvider } from "./app/providers/NotificationsProvider";
 import { EscalationRulesProvider } from "./app/providers/EscalationRulesProvider";
+import { I18nProvider } from "./app/providers/I18nProvider";
 
 export default function App() {
   return (
     <ToastProvider>
+      <I18nProvider>
       <LogsProvider>
         <UsersProvider>
           <ConfirmProvider>
@@ -31,6 +33,7 @@ export default function App() {
           </ConfirmProvider>
         </UsersProvider>
       </LogsProvider>
+          </I18nProvider>
     </ToastProvider>
   );
 }

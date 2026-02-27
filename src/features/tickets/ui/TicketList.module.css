@@ -125,3 +125,16 @@
   font-size: 12px;
   color: var(--text);
 }
+
+
+.emptyCard{
+  border: 1px dashed var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  background: rgba(255,255,255,0.03);
+  color: var(--muted);
+  display: grid;
+  gap: 8px;
+}
+.emptyTitle{ color: var(--text); font-weight: 950; }
+.emptyActions{ display: flex; gap: 10px; flex-wrap: wrap; }

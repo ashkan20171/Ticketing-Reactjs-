@@ -23,6 +23,8 @@
   --r-md: 12px;
   --r-lg: 18px;
   --shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 18px 44px rgba(0, 0, 0, 0.45);
+  --ring: 0 0 0 3px rgba(37, 99, 235, 0.32);
 
   /* Spacing */
   --s-1: 6px;
@@ -40,4 +42,6 @@
   --muted: #6b7280;
   --border: rgba(17, 24, 39, 0.08);
   --shadow: 0 10px 24px rgba(17, 24, 39, 0.12);
+  --shadow-lg: 0 14px 36px rgba(17, 24, 39, 0.14);
+  --ring: 0 0 0 3px rgba(37, 99, 235, 0.22);
 }

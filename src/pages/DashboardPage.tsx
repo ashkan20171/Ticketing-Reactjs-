@@ -1,4 +1,5 @@
 import React from "react";
+import { useI18n } from "../app/providers/I18nProvider";
 import { Card } from "../shared/ui/Card/Card";
 import { Button } from "../shared/ui/Button/Button";
 import { useTickets } from "../app/providers/TicketsProvider";
@@ -7,6 +8,7 @@ import { Ticket } from "../shared/types/ticket";
 import { PieChart } from "../shared/ui/PieChart";
 import { BarChart } from "../shared/ui/charts/BarChart";
 import { LineChart } from "../shared/ui/charts/LineChart";
+import { Skeleton } from "../shared/ui/Skeleton";
 
 function isSlaBreached(t: Ticket, slaHours: number) {
   if (t.status !== "open") return false;
@@ -15,8 +17,9 @@ function isSlaBreached(t: Ticket, slaHours: number) {
 }
 
 export function DashboardPage() {
+  const { t, lang } = useI18n();
   const [range, setRange] = React.useState<"7" | "30" | "all">("30");
-  const { tickets } = useTickets();
+  const { tickets, loading } = useTickets();
   const { settings } = useSettings();
 
   const visibleTickets = React.useMemo(() => {
@@ -51,7 +54,7 @@ export function DashboardPage() {
       const key = d.toISOString().slice(0, 10);
       const count = visibleTickets.filter((t) => t.createdAt.slice(0, 10) === key).length;
       list.push({
-        label: d.toLocaleDateString("fa-IR", { month: "2-digit", day: "2-digit" }),
+        label: d.toLocaleDateString(lang === "fa" ? "fa-IR" : "en-US", { month: "2-digit", day: "2-digit" }),
         value: count,
       });
     }
@@ -62,33 +65,62 @@ export function DashboardPage() {
   return (
     <div style={{ padding: 12, display: "grid", gap: 14 }}>
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
-        <div style={{ fontWeight: 900 }}>بازه گزارش:</div>
+        <div style={{ fontWeight: 900 }}>{t("بازه گزارش:")}</div>
         <Button variant={range === "7" ? "secondary" : "ghost"} onClick={() => setRange("7")}>
-          ۷ روز
+          {t("۷ روز")}
         </Button>
         <Button variant={range === "30" ? "secondary" : "ghost"} onClick={() => setRange("30")}>
-          ۳۰ روز
+          {t("۳۰ روز")}
         </Button>
         <Button variant={range === "all" ? "secondary" : "ghost"} onClick={() => setRange("all")}>
-          همه
+          {t("همه")}
         </Button>
       </div>
 
+      {loading ? (
+        <div style={{ display: "grid", gap: 12 }}>
+          <Card>
+            <div style={{ display: "grid", gap: 10 }}>
+              <Skeleton h={20} w="42%" />
+              <Skeleton h={14} w="86%" />
+              <Skeleton h={14} w="74%" />
+            </div>
+          </Card>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Card key={i}>
+                <div style={{ display: "grid", gap: 10 }}>
+                  <Skeleton h={16} w="60%" />
+                  <Skeleton h={34} w="40%" />
+                  <Skeleton h={12} w="80%" />
+                </div>
+              </Card>
+            ))}
+          </div>
+
+          <Card>
+            <Skeleton h={260} />
+          </Card>
+        </div>
+      ) : null}
+
+      {!loading ? (
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0, 1fr))", gap: 12 }}>
         <Card>
-          <div style={{ fontSize: 12, color: "var(--muted)" }}>کل</div>
+          <div style={{ fontSize: 12, color: "var(--muted)" }}>{t("کل")}</div>
           <div style={{ fontSize: 22, fontWeight: 900, marginTop: 6 }}>{stats.total}</div>
         </Card>
         <Card>
-          <div style={{ fontSize: 12, color: "var(--muted)" }}>باز</div>
+          <div style={{ fontSize: 12, color: "var(--muted)" }}>{t("باز")}</div>
           <div style={{ fontSize: 22, fontWeight: 900, marginTop: 6 }}>{stats.open}</div>
         </Card>
         <Card>
-          <div style={{ fontSize: 12, color: "var(--muted)" }}>در انتظار</div>
+          <div style={{ fontSize: 12, color: "var(--muted)" }}>{t("در انتظار")}</div>
           <div style={{ fontSize: 22, fontWeight: 900, marginTop: 6 }}>{stats.pending}</div>
         </Card>
         <Card>
-          <div style={{ fontSize: 12, color: "var(--muted)" }}>بسته</div>
+          <div style={{ fontSize: 12, color: "var(--muted)" }}>{t("بسته")}</div>
           <div style={{ fontSize: 22, fontWeight: 900, marginTop: 6 }}>{stats.closed}</div>
         </Card>
         <Card>
@@ -100,21 +132,21 @@ export function DashboardPage() {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
         <Card>
           <BarChart
-            title="مقایسه وضعیت‌ها"
+            title={t("مقایسه وضعیت‌ها")}
             items={[
-              { label: "باز", value: stats.open },
-              { label: "در انتظار", value: stats.pending },
-              { label: "بسته", value: stats.closed },
+              { label: t("باز"), value: stats.open },
+              { label: t("در انتظار"), value: stats.pending },
+              { label: t("بسته"), value: stats.closed },
             ]}
           />
         </Card>
         <Card>
           <BarChart
-            title="مقایسه دپارتمان‌ها"
+            title={t("مقایسه دپارتمان‌ها")}
             items={[
-              { label: "فنی", value: stats.byDept["فنی"] },
-              { label: "مالی", value: stats.byDept["مالی"] },
-              { label: "فروش", value: stats.byDept["فروش"] },
+              { label: t("فنی"), value: stats.byDept["فنی"] },
+              { label: t("مالی"), value: stats.byDept["مالی"] },
+              { label: t("فروش"), value: stats.byDept["فروش"] },
             ]}
           />
         </Card>
@@ -122,29 +154,31 @@ export function DashboardPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
         <Card>
-          <LineChart title="روند ایجاد تیکت" series={trend} />
+          <LineChart title={t("روند ایجاد تیکت")} series={trend} />
         </Card>
         <Card>
-          <div style={{ fontWeight: 900, marginBottom: 10 }}>نسبت وضعیت‌ها</div>
+          <div style={{ fontWeight: 900, marginBottom: 10 }}>{t("نسبت وضعیت‌ها")}</div>
           <div style={{ display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
             <PieChart open={stats.open} pending={stats.pending} closed={stats.closed} />
             <div style={{ display: "grid", gap: 8, color: "var(--muted)", fontSize: 13 }}>
               <div>
                 <span style={{ display: "inline-block", width: 10, height: 10, borderRadius: 999, background: "#2563eb", marginLeft: 8 }} />{" "}
-                باز: <b style={{ color: "var(--text)" }}>{stats.open}</b>
+                {t("باز")}: <b style={{ color: "var(--text)" }}>{stats.open}</b>
               </div>
               <div>
                 <span style={{ display: "inline-block", width: 10, height: 10, borderRadius: 999, background: "#f59e0b", marginLeft: 8 }} />{" "}
-                در انتظار: <b style={{ color: "var(--text)" }}>{stats.pending}</b>
+                {t("در انتظار")}: <b style={{ color: "var(--text)" }}>{stats.pending}</b>
               </div>
               <div>
                 <span style={{ display: "inline-block", width: 10, height: 10, borderRadius: 999, background: "#16a34a", marginLeft: 8 }} />{" "}
-                بسته: <b style={{ color: "var(--text)" }}>{stats.closed}</b>
+                {t("بسته")}: <b style={{ color: "var(--text)" }}>{stats.closed}</b>
               </div>
             </div>
           </div>
         </Card>
       </div>
-    </div>
+          ) : null}
+
+</div>
   );
 }

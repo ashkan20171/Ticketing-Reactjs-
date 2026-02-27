@@ -34,7 +34,7 @@ export function Modal({
         position: "fixed",
         inset: 0,
         zIndex: 9998,
-        background: "rgba(2,6,23,0.60)",
+        background: "rgba(0,0,0,0.55)",
         backdropFilter: "blur(6px)",
         display: "grid",
         placeItems: "center",
@@ -49,7 +49,7 @@ export function Modal({
           width: "min(100%, " + width + "px)",
           borderRadius: 20,
           border: "1px solid var(--border)",
-          background: "rgba(17,24,39,0.85)",
+          background: "color-mix(in srgb, var(--surface) 92%, transparent)",
           boxShadow: "0 22px 70px rgba(0,0,0,0.35)",
           overflow: "hidden",
         }}

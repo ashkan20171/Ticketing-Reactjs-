@@ -5,6 +5,7 @@ import { getUser, logout } from "../../features/auth/model/auth";
 import { useToast } from "./ToastProvider";
 import { useSettings } from "./SettingsProvider";
 import { useConfirm } from "./ConfirmProvider";
+import { useI18n } from "./I18nProvider";
 
 type Cmd = {
   id: string;
@@ -20,6 +21,7 @@ export function CommandPalette() {
   const { toast } = useToast();
   const { settings, setTheme } = useSettings();
   const { confirm } = useConfirm();
+  const { t, dir } = useI18n();
 
   const user = getUser();
   const isAdmin = user?.role === "admin";
@@ -30,25 +32,26 @@ export function CommandPalette() {
 
   const cmds = useMemo<Cmd[]>(() => {
     const base: Cmd[] = [
-      { id: "go_tickets", title: "رفتن به تیکت‌ها", hint: "G T", keywords: "tickets list", run: () => nav("/") },
-      { id: "go_my_dashboard", title: "رفتن به داشبورد من", hint: "G M", keywords: "my dashboard analytics", run: () => nav("/my-dashboard") },
-      { id: "go_profile", title: "رفتن به پروفایل", hint: "G P", keywords: "profile prefs settings", run: () => nav("/profile") },
-      { id: "new_ticket", title: "ایجاد تیکت جدید", hint: "N", keywords: "create ticket", run: () => (document.getElementById("btn-new-ticket") as HTMLButtonElement | null)?.click() },
+      { id: "go_tickets", title: t("رفتن به تیکت‌ها"), hint: "G T", keywords: "tickets list", run: () => nav("/") },
+      { id: "go_my_dashboard", title: t("رفتن به داشبورد من"), hint: "G M", keywords: "my dashboard analytics", run: () => nav("/my-dashboard") },
+      { id: "go_profile", title: t("رفتن به پروفایل"), hint: "G P", keywords: "profile prefs settings", run: () => nav("/profile") },
+      { id: "go_help", title: t("راهنما و میانبرها"), hint: "?", keywords: "help shortcuts", run: () => nav("/help") },
+      { id: "new_ticket", title: t("ایجاد تیکت جدید"), hint: "N", keywords: "create ticket", run: () => (document.getElementById("btn-new-ticket") as HTMLButtonElement | null)?.click() },
       { id: "toggle_theme", title: settings.theme === "dark" ? "تغییر به Light" : "تغییر به Dark", hint: "T", keywords: "theme dark light", run: () => setTheme(settings.theme === "dark" ? "light" : "dark") },
-      { id: "logout", title: "خروج از سیستم", hint: "L", keywords: "logout exit", run: async () => {
-        const ok = await confirm({ title: "خروج", message: "آیا از خروج مطمئن هستید؟", danger: true, confirmText: "خروج" });
+      { id: "logout", title: t("خروج از سیستم"), hint: "L", keywords: "logout exit", run: async () => {
+        const ok = await confirm({ title: t("خروج"), message: "آیا از خروج مطمئن هستید؟", danger: true, confirmText: "خروج" });
         if (!ok) return;
         logout();
-        toast({ type: "info", title: "خروج انجام شد" });
+        toast({ type: "info", title: t("خروج انجام شد") });
         nav("/login", { replace: true });
       }},
     ];
 
     const admin: Cmd[] = [
-      { id: "go_dashboard", title: "رفتن به داشبورد", hint: "G D", keywords: "dashboard analytics", run: () => nav("/dashboard"), adminOnly: true },
-      { id: "go_settings", title: "رفتن به تنظیمات", hint: "G S", keywords: "settings", run: () => nav("/settings"), adminOnly: true },
-      { id: "go_users", title: "رفتن به کاربران", hint: "G U", keywords: "users roles", run: () => nav("/users"), adminOnly: true },
-      { id: "go_logs", title: "رفتن به لاگ‌ها", hint: "G L", keywords: "logs audit", run: () => nav("/logs"), adminOnly: true },
+      { id: "go_dashboard", title: t("رفتن به داشبورد"), hint: "G D", keywords: "dashboard analytics", run: () => nav("/dashboard"), adminOnly: true },
+      { id: "go_settings", title: t("رفتن به تنظیمات"), hint: "G S", keywords: "settings", run: () => nav("/settings"), adminOnly: true },
+      { id: "go_users", title: t("رفتن به کاربران"), hint: "G U", keywords: "users roles", run: () => nav("/users"), adminOnly: true },
+      { id: "go_logs", title: t("رفتن به لاگ‌ها"), hint: "G L", keywords: "logs audit", run: () => nav("/logs"), adminOnly: true },
     ];
 
     return isAdmin ? [...admin, ...base] : base;
@@ -113,7 +116,7 @@ export function CommandPalette() {
       width={720}
       footer={
         <div style={{ display: "flex", justifyContent: "space-between", color: "var(--muted)", fontSize: 12 }}>
-          <span>Ctrl+K برای باز/بستن • Enter اجرا • Esc بستن</span>
+          <span>{t("Ctrl+K برای باز/بستن • Enter اجرا • Esc بستن")}</span>
           <span>{user?.email ?? ""}</span>
         </div>
       }
@@ -122,7 +125,7 @@ export function CommandPalette() {
         autoFocus
         value={q}
         onChange={(e) => setQ(e.target.value)}
-        placeholder="جستجو دستور... (مثلاً dashboard, settings, logout)"
+        placeholder={t("جستجو دستور... (مثلاً dashboard, settings, logout)")}
         style={{
           width: "100%",
           padding: "12px 14px",
@@ -146,7 +149,7 @@ export function CommandPalette() {
               });
             }}
             style={{
-              textAlign: "right",
+              textAlign: dir === "rtl" ? "right" : "left",
               borderRadius: 14,
               border: "1px solid var(--border)",
               background: idx === active ? "rgba(37,99,235,0.18)" : "rgba(255,255,255,0.03)",
@@ -174,7 +177,7 @@ export function CommandPalette() {
           </button>
         ))}
         {filtered.length === 0 ? (
-          <div style={{ color: "var(--muted)", padding: 10 }}>چیزی پیدا نشد.</div>
+          <div style={{ color: "var(--muted)", padding: 10 }}>{t("چیزی پیدا نشد.")}</div>
         ) : null}
       </div>
     </Modal>

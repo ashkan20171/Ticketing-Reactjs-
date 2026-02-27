@@ -10,6 +10,7 @@ import { getUser } from "../../../features/auth/model/auth";
 import { downloadTextFile, toCsv } from "../../../shared/lib/csv";
 import { useToast } from "../../../app/providers/ToastProvider";
 import { useSettings } from "../../../app/providers/SettingsProvider";
+import { useI18n } from "../../../app/providers/I18nProvider";
 
 type Props = { tickets: Ticket[]; onCreate: (t: Ticket) => void };
 type SortKey = "newest" | "oldest" | "priority";
@@ -20,8 +21,38 @@ type Filters = {
   sort: SortKey;
 };
 
-function statusText(s: TicketStatus) {
-  return s === "open" ? "باز" : s === "pending" ? "در انتظار" : "بسته";
+type SavedView = { id: string; name: string; query: string; pinned?: boolean; createdAt?: number };
+
+function loadViews(): SavedView[] {
+  try {
+    const raw = localStorage.getItem("ticket_views_v1");
+    if (!raw) return [];
+    const v = JSON.parse(raw);
+
+    const list: any[] = Array.isArray(v) ? v : [];
+    // backward compatible
+    return list
+      .filter(Boolean)
+      .map((x) => ({
+        id: String(x.id ?? ""),
+        name: String(x.name ?? "نما"),
+        query: String(x.query ?? ""),
+        pinned: Boolean(x.pinned),
+        createdAt: typeof x.createdAt === "number" ? x.createdAt : Date.now(),
+      }))
+      .filter((x) => x.id && x.query !== undefined);
+  } catch {
+    return [];
+  }
+}
+
+function saveViews(list: SavedView[]) {
+  localStorage.setItem("ticket_views_v1", JSON.stringify(list));
+}
+
+
+function statusText(s: TicketStatus, tr: (x: string) => string) {
+  return s === "open" ? tr("باز") : s === "pending" ? tr("در انتظار") : tr("بسته");
 }
 
 function badgeBg(status: TicketStatus) {
@@ -49,8 +80,11 @@ export function TicketList({ tickets, onCreate }: Props) {
   const user = getUser();
   const isAdmin = user?.role === "admin";
   const { settings } = useSettings();
+  const { t: tr } = useI18n();
 
   const [searchParams, setSearchParams] = useSearchParams();
+  const [views, setViews] = useState<SavedView[]>(() => loadViews());
+  const [activeViewId, setActiveViewId] = useState<string>("");
 
   // init from URL
   const initialQ = searchParams.get("q") ?? "";
@@ -127,6 +161,71 @@ export function TicketList({ tickets, onCreate }: Props) {
     setFilters({ status: "all", department: "all", priority: "all", sort: "newest" });
   };
 
+  const applyView = (id: string) => {
+    const v = views.find((x) => x.id === id);
+    if (!v) return;
+    setActiveViewId(id);
+    setSearchParams(v.query);
+    toast({ type: "info", title: `${tr("نما اعمال شد: ")}${v.name}` });
+  };
+
+  const saveCurrentView = () => {
+    const name = window.prompt(tr("نام این نما را وارد کنید:"));
+    if (!name) return;
+    const query = searchParams.toString();
+    const id = String(Date.now());
+    const next = [{ id, name: name.trim(), query }, ...views].slice(0, 12);
+    setViews(next);
+    saveViews(next);
+    setActiveViewId(id);
+    toast({ type: "success", title: tr("نما ذخیره شد") });
+  };
+
+  const deleteActiveView = () => {
+    const v = views.find((x) => x.id === activeViewId);
+    if (!v) return;
+    const ok = window.confirm(`${tr("حذف نما: ")}${v.name} ؟`);
+    if (!ok) return;
+    const next = views.filter((x) => x.id !== activeViewId);
+    setViews(next);
+    saveViews(next);
+    setActiveViewId("");
+    toast({ type: "info", title: tr("نما حذف شد") });
+  };
+
+  const renameActiveView = () => {
+    const v = views.find((x) => x.id === activeViewId);
+    if (!v) return;
+    const name = window.prompt(tr("نام جدید برای این نما:"), v.name);
+    if (!name || !name.trim()) return;
+    const next = views.map((x) => (x.id === v.id ? { ...x, name: name.trim() } : x));
+    setViews(next);
+    saveViews(next);
+    toast({ type: "success", title: tr("نام نما تغییر کرد") });
+  };
+
+  const togglePinActiveView = () => {
+    const v = views.find((x) => x.id === activeViewId);
+    if (!v) return;
+    const next = views.map((x) => (x.id === v.id ? { ...x, pinned: !x.pinned } : x));
+    setViews(next);
+    saveViews(next);
+    toast({ type: "info", title: v.pinned ? tr("پین برداشته شد") : tr("نما پین شد") });
+  };
+
+  const copyActiveViewLink = async () => {
+    const v = views.find((x) => x.id === activeViewId);
+    if (!v) return;
+    const url = `${window.location.origin}${window.location.pathname}?${v.query}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      toast({ type: "success", title: tr("لینک کپی شد") });
+    } catch {
+      // fallback
+      window.prompt(tr("لینک را کپی کنید:"), url);
+    }
+  };
+
   const exportCsv = () => {
     const headers = ["id", "title", "department", "status", "priority", "createdAt", "requesterEmail"];
     const rows = processed.map((t) => ({
@@ -140,7 +239,7 @@ export function TicketList({ tickets, onCreate }: Props) {
     }));
     const csv = toCsv(rows as any, headers);
     downloadTextFile(`ashkan-tickets-${new Date().toISOString().slice(0, 10)}.csv`, csv);
-    toast({ type: "success", title: "خروجی گرفته شد", message: "فایل CSV دانلود شد." });
+    toast({ type: "success", title: tr("خروجی گرفته شد"), message: tr("فایل CSV دانلود شد.") });
   };
 
   return (
@@ -171,6 +270,31 @@ export function TicketList({ tickets, onCreate }: Props) {
         <Button variant="secondary" onClick={() => setAdvancedOpen((v) => !v)} aria-expanded={advancedOpen}>
           فیلتر پیشرفته
         </Button>
+        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+          <select
+            className={styles.select}
+            value={activeViewId}
+            onChange={(e) => applyView(e.target.value)}
+            aria-label="نماهای ذخیره شده"
+            style={{ minWidth: 190 }}
+          >
+            <option value="">نماهای ذخیره شده…</option>
+            {[...views]
+              .sort((a, b) => Number(Boolean(b.pinned)) - Number(Boolean(a.pinned)) || a.name.localeCompare(b.name, "fa"))
+              .map((v) => (
+                <option key={v.id} value={v.id}>
+                  {v.pinned ? "📌 " : ""}{v.name}
+                </option>
+              ))}
+          </select>
+
+          <Button variant="secondary" onClick={saveCurrentView}>ذخیره نما</Button>
+          <Button variant="ghost" onClick={copyActiveViewLink} disabled={!activeViewId}>کپی لینک</Button>
+          <Button variant="ghost" onClick={togglePinActiveView} disabled={!activeViewId}>{views.find((v) => v.id === activeViewId)?.pinned ? "آنپین" : "پین"}</Button>
+          <Button variant="ghost" onClick={renameActiveView} disabled={!activeViewId}>تغییر نام</Button>
+          <Button variant="ghost" onClick={deleteActiveView} disabled={!activeViewId}>حذف</Button>
+        </div>
+
       </div>
 
       {advancedOpen ? (
@@ -270,7 +394,7 @@ export function TicketList({ tickets, onCreate }: Props) {
               {isSlaBreached(t, settings.slaHours) ? <span className={styles.sla}>SLA</span> : null}
 
               <span className={styles.badge} style={{ background: badgeBg(t.status) }}>
-                {statusText(t.status)}
+                {statusText(t.status, tr)}
               </span>
 
               <Button size="sm" variant="ghost" onClick={() => nav(`/tickets/${t.id}`)}>
@@ -280,7 +404,16 @@ export function TicketList({ tickets, onCreate }: Props) {
           </div>
         ))}
 
-        {paged.length === 0 ? <div className={styles.empty}>نتیجه‌ای پیدا نشد.</div> : null}
+        {paged.length === 0 ? (
+          <div className={styles.emptyCard}>
+            <div className={styles.emptyTitle}>نتیجه‌ای پیدا نشد</div>
+            <div>اگر فیلترها زیاد محدود شده‌اند، ریست کن یا یک «نما» جدید بساز.</div>
+            <div className={styles.emptyActions}>
+              <Button variant="secondary" onClick={resetFilters}>ریست فیلترها</Button>
+              <Button variant="ghost" onClick={() => setAdvancedOpen(true)}>باز کردن فیلتر پیشرفته</Button>
+            </div>
+          </div>
+        ) : null}
       </div>
 
       <div className={styles.pager}>
