@@ -1,70 +1,49 @@
-# Ashkan Ticketing v15 (Enterprise UX)
+# Ticketing System (React.js)
 
-## New
-- Toast Queue (max 5, auto-dismiss)
-- Confirm Dialog System (promise-based)
-- Command Palette (Ctrl+K)
-  - Navigate: tickets/dashboard/settings/users/logs
-  - Toggle theme
-  - Create new ticket
-  - Logout with confirmation
-- Confirm integrated into:
-  - Clear logs
-  - Toggle user active
+A professional-grade ticketing application built with React.js, designed to streamline issue tracking, status management, and task resolution workflows.
 
+## 🚀 Overview
 
-## v16
-- Added My Dashboard for all users (/my-dashboard) with charts and range filter.
+This application provides a structured environment for managing support tickets. It was designed to address real-world business requirements such as tracking issue statuses (Open/In-Progress/Resolved), filtering by priority, and managing user-reported tasks.
 
+The project demonstrates a deep understanding of **complex form handling**, **state management**, and **CRUD (Create, Read, Update, Delete) operations** in a modern frontend architecture.
 
-## v16.1
-- Fixed user view: My Dashboard link visible for non-admin
-- Updated mock tickets to include user@example.com so list isn't empty
+## ✨ Key Features
 
+- **Ticket Dashboard:** View and manage tickets with status indicators.
+- **Advanced Filtering:** Sort and search tickets by priority, status, or category.
+- **Workflow Management:** Update ticket statuses and assign priorities dynamically.
+- **Complex Form Handling:** User-friendly interfaces for creating and editing tickets.
+- **Responsive UI:** Clean, intuitive interface optimized for both desktop and admin use.
 
-## v17
-- Login page: sidebar/panel hidden
-- Added Profile page (/profile) for all users (prefs + displayName)
-- Quick Stats on Tickets page (toggle via Profile)
-- UserPrefs persisted per-user in localStorage
+## 🛠️ Tech Stack
 
+- **Framework:** React.js
+- **State Management:** [e.g., Redux Toolkit / Context API / Zustand]
+- **Routing:** React Router
+- **Styling:** [e.g., Tailwind CSS / CSS Modules]
+- **Form Handling:** [e.g., React Hook Form / Formik]
+- **Build Tool:** [e.g., Vite]
 
-## v17.3
-- Login page: body grid collapses to single column (no empty sidebar space)
-- Main area centers content only on /login
+## 🧠 Engineering Decisions
 
+Building a ticketing system involves managing state across multiple views. I focused on:
 
-## v19
-- Enterprise SLA (Business hours + pause on pending + holidays)
-- SLA badge on ticket list
-- SLA KPIs on My Dashboard
+- **Modular Architecture:** Separating components into `features`, `ui`, and `services` to ensure scalability.
+- **Data Integrity:** Implementing validation logic for ticket forms to ensure clean data input.
+- **Performance:** Optimizing re-renders when updating ticket lists and statuses.
+- **UX for Business Tools:** Focusing on a "no-nonsense" design that mimics Jira/Zendesk for better usability.
 
-> Note: install chart dependency if needed: npm i recharts
+## 💻 Getting Started
 
+### Prerequisites
+- Node.js (v16+)
+- npm or yarn
 
-## v20
-- Settings UI: Enterprise SLA policy editor + working calendar + holidays
-- SettingsProvider supports slaPolicy/workCalendar updates
+### Installation & Run
 
-
-## v21
-- Ticket Details: Enterprise SLA widget (countdown + progress)
-- Timeline widget
-- mockTickets now include messages + timestamps + priority
-
-
-## v22
-- Auto SLA monitoring (every 5s)
-- Notifications (toast) for at-risk and breached
-- Auto escalation on breach (priority bump + system message + audit log)
-
-
-## v23
-- Notification Center (bell + unread badge + dropdown)
-- Notifications persisted in localStorage
-- SLA monitor pushes notifications (at-risk & breached)
-
-
-## v24
-- Admin Escalation Rules Panel (/escalations)
-- SLA monitor configurable (interval, at-risk threshold, notify toggles, auto-escalate)
+1. **Clone the repository:**
+```bash
+   git clone https://github.com/ashkan20171/Ticketing-Reactjs-.git
+   cd Ticketing-Reactjs-
+   
